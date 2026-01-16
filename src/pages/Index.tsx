@@ -1,12 +1,103 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserPlus, MapPin, Settings, Search, Car } from "lucide-react";
+import HeroSection from "@/components/HeroSection";
+import DriverRegistration from "@/components/DriverRegistration";
+import RequestRide from "@/components/RequestRide";
+import RideManagement from "@/components/RideManagement";
+import InfoLookup from "@/components/InfoLookup";
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState("request");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-accent">
+                <Car className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">RideChain</h1>
+                <p className="text-xs text-muted-foreground">Web3 Ride Sharing</p>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary border border-border">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-sm font-mono text-muted-foreground">0x1234...5678</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <HeroSection />
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8 pb-16">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsList className="w-full grid grid-cols-4 h-auto p-1.5 bg-card border border-border rounded-xl">
+            <TabsTrigger 
+              value="request" 
+              className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground rounded-lg transition-all"
+            >
+              <MapPin className="w-4 h-4" />
+              <span className="hidden sm:inline">Request</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="driver" 
+              className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground rounded-lg transition-all"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span className="hidden sm:inline">Driver</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="manage" 
+              className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground rounded-lg transition-all"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Kelola</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="info" 
+              className="flex items-center gap-2 py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-accent data-[state=active]:text-primary-foreground rounded-lg transition-all"
+            >
+              <Search className="w-4 h-4" />
+              <span className="hidden sm:inline">Info</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="max-w-2xl mx-auto">
+            <TabsContent value="request" className="mt-0">
+              <RequestRide />
+            </TabsContent>
+
+            <TabsContent value="driver" className="mt-0">
+              <DriverRegistration />
+            </TabsContent>
+
+            <TabsContent value="manage" className="mt-0">
+              <RideManagement />
+            </TabsContent>
+
+            <TabsContent value="info" className="mt-0">
+              <InfoLookup />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-6">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            Powered by Smart Contract · Transparent · Decentralized
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
