@@ -1,14 +1,35 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserPlus, MapPin, Settings, Search, Car } from "lucide-react";
+import { UserPlus, MapPin, Settings, Search, Car, Wallet, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import HeroSection from "@/components/HeroSection";
 import DriverRegistration from "@/components/DriverRegistration";
 import RequestRide from "@/components/RequestRide";
 import RideManagement from "@/components/RideManagement";
 import InfoLookup from "@/components/InfoLookup";
+import { toast } from "sonner";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("request");
+  const [isConnected, setIsConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+
+  const handleConnect = () => {
+    // Simulate wallet connection
+    const mockAddress = "0x" + Math.random().toString(16).slice(2, 10) + "..." + Math.random().toString(16).slice(2, 6);
+    const fullAddress = "0x" + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    setWalletAddress(fullAddress);
+    setIsConnected(true);
+    toast.success("Wallet terhubung!", {
+      description: `Connected to ${fullAddress.slice(0, 6)}...${fullAddress.slice(-4)}`,
+    });
+  };
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setWalletAddress("");
+    toast.info("Wallet terputus");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,10 +46,30 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Web3 Ride Sharing</p>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary border border-border">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-mono text-muted-foreground">0x1234...5678</span>
-            </div>
+            
+            {isConnected ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary border border-border">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-sm font-mono text-muted-foreground">
+                    {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+                  </span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleDisconnect}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button variant="hero" onClick={handleConnect} className="gap-2">
+                <Wallet className="w-4 h-4" />
+                Connect Wallet
+              </Button>
+            )}
           </div>
         </div>
       </header>
