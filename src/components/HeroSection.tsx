@@ -10,11 +10,6 @@ const HeroSection = () => {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border mb-6">
-          <Shield className="w-4 h-4 text-primary" />
-          <span className="text-sm text-muted-foreground">Powered by Smart Contract</span>
-        </div>
-
         <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
           <span className="gradient-text">Decentralized</span>
           <br />
@@ -22,7 +17,7 @@ const HeroSection = () => {
         </h1>
 
         <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Platform ride-sharing terdesentralisasi yang transparan dan aman. 
+          Platform ride-sharing terdesentralisasi yang transparan dan aman.
           Semua transaksi tercatat di blockchain.
         </p>
 

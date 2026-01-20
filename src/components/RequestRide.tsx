@@ -3,9 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { toast } from "sonner";
+
+import { parseEther } from "viem";
+import { chainsToContract, rideSharingAbi } from "@/constants";
+import { useChainId, useConfig, useConnection } from "wagmi";
+import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
+import { sepolia } from "wagmi/chains";
 
 const RequestRide = () => {
   const [formData, setFormData] = useState({
@@ -16,19 +28,65 @@ const RequestRide = () => {
     catatan: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const account = useConnection();
+  const chainId = useChainId();
+  const config = useConfig();
+  const rideSharing = chainsToContract[chainId]["rideSharing"];
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Simulate calling requestRide smart contract function
-    console.log("requestRide called with:", formData);
-    toast.success("Request ride berhasil!", {
-      description: `Perjalanan dari ${formData.lokasiAwal} ke ${formData.lokasiTujuan} telah dibuat.`,
+
+    if (account.isDisconnected) {
+      toast.error("Wallet belum terhubung", {
+        description: "Silakan hubungkan wallet Anda terlebih dahulu.",
+      });
+      return;
+    }
+
+    const response = await writeContract(config, {
+      abi: rideSharingAbi,
+      address: rideSharing as `0x${string}`,
+      functionName: "requestRide",
+      args: [
+        formData.lokasiAwal,
+        formData.lokasiTujuan,
+        parseEther(formData.tarifPerKm),
+        formData.jarakKm as unknown as bigint,
+        formData.catatan,
+      ],
+      chain: sepolia,
+      account: account.address,
     });
-    setFormData({ lokasiAwal: "", lokasiTujuan: "", tarifPerKm: "", jarakKm: "", catatan: "" });
+
+    const toastId = toast.loading("Memproses request ride...");
+    const receipt = await waitForTransactionReceipt(config, { hash: response });
+    toast.dismiss(toastId);
+
+    if (receipt.status) {
+      toast.success("Request ride berhasil!", {
+        description: `Perjalanan dari ${formData.lokasiAwal} ke ${formData.lokasiTujuan} telah dibuat.`,
+      });
+      setFormData({
+        lokasiAwal: "",
+        lokasiTujuan: "",
+        tarifPerKm: "",
+        jarakKm: "",
+        catatan: "",
+      });
+    } else {
+      toast.error("Request ride gagal!", {
+        description: "Terjadi kesalahan saat memproses transaksi.",
+      });
+    }
   };
 
-  const estimatedCost = formData.tarifPerKm && formData.jarakKm 
-    ? (parseFloat(formData.tarifPerKm) * parseFloat(formData.jarakKm)).toFixed(4)
-    : "0";
+  const estimatedCost =
+    formData.tarifPerKm && formData.jarakKm
+      ? (
+          parseFloat(formData.tarifPerKm) * parseFloat(formData.jarakKm)
+        ).toFixed(4)
+      : "0";
 
   return (
     <Card className="gradient-border">
@@ -52,7 +110,9 @@ const RequestRide = () => {
                 id="lokasiAwal"
                 placeholder="Alamat jemput"
                 value={formData.lokasiAwal}
-                onChange={(e) => setFormData({ ...formData, lokasiAwal: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lokasiAwal: e.target.value })
+                }
                 required
               />
             </div>
@@ -62,7 +122,9 @@ const RequestRide = () => {
                 id="lokasiTujuan"
                 placeholder="Alamat tujuan"
                 value={formData.lokasiTujuan}
-                onChange={(e) => setFormData({ ...formData, lokasiTujuan: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lokasiTujuan: e.target.value })
+                }
                 required
               />
             </div>
@@ -76,7 +138,9 @@ const RequestRide = () => {
                 step="0.0001"
                 placeholder="0.001"
                 value={formData.tarifPerKm}
-                onChange={(e) => setFormData({ ...formData, tarifPerKm: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, tarifPerKm: e.target.value })
+                }
                 required
               />
             </div>
@@ -87,7 +151,9 @@ const RequestRide = () => {
                 type="number"
                 placeholder="10"
                 value={formData.jarakKm}
-                onChange={(e) => setFormData({ ...formData, jarakKm: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, jarakKm: e.target.value })
+                }
                 required
               />
             </div>
@@ -98,15 +164,21 @@ const RequestRide = () => {
               id="catatan"
               placeholder="Catatan tambahan untuk driver..."
               value={formData.catatan}
-              onChange={(e) => setFormData({ ...formData, catatan: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, catatan: e.target.value })
+              }
               className="bg-input border-border focus:border-primary"
             />
           </div>
-          
+
           <div className="p-4 rounded-lg bg-secondary/50 border border-border">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Estimasi Total</span>
-              <span className="text-lg font-bold gradient-text font-mono">{estimatedCost} ETH</span>
+              <span className="text-sm text-muted-foreground">
+                Estimasi Total
+              </span>
+              <span className="text-lg font-bold gradient-text font-mono">
+                {estimatedCost} ETH
+              </span>
             </div>
           </div>
 
