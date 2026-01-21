@@ -2,7 +2,7 @@ import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { sepolia } from "wagmi/chains"; // Import your desired chains
 
 // Retrieve the WalletConnect Project ID from environment variables
-const walletConnectProjectId = ""; // fill with your wallet connect project id
+const walletConnectProjectId = ""; // your own wallet connect project id
 
 // Basic error handling for missing Project ID
 if (!walletConnectProjectId) {

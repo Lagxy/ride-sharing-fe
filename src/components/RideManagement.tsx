@@ -12,15 +12,16 @@ import {
 import { CheckCircle, XCircle, Play, Wallet, Flag, Search } from "lucide-react";
 import { toast } from "sonner";
 
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import { chainsToContract, rideSharingAbi } from "@/constants";
-import { useChainId, useConfig, useConnection, useReadContract } from "wagmi";
+import { useChainId, useConfig, useConnection } from "wagmi";
 import {
   readContract,
   writeContract,
   waitForTransactionReceipt,
 } from "@wagmi/core";
 import { sepolia } from "wagmi/chains";
+import { parse } from "path";
 
 const RideManagement = () => {
   const [rideIndex, setRideIndex] = useState("");
@@ -120,8 +121,8 @@ const RideManagement = () => {
   };
 
   const handleFund = async () => {
-    if (!rideIndex || !fundRideIndex) {
-      toast.error("Masukkan Ride Index dan jumlah ETH");
+    if (!fundRideIndex) {
+      toast.error("Masukkan Ride Index");
       return;
     }
 
@@ -136,7 +137,8 @@ const RideManagement = () => {
       abi: rideSharingAbi,
       address: rideSharing as `0x${string}`,
       functionName: "fundRide",
-      args: [rideIndex as unknown as bigint],
+      args: [fundRideIndex as unknown as bigint],
+      value: parseEther(estimatedCost),
       chain: sepolia,
       account: account.address,
     });
